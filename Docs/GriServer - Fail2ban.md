@@ -1,5 +1,9 @@
 Related: [[GriServer]]
 
+Fail2ban monitors log files and automatically blocks IPs that show malicious behavior, such as repeatedly failing authentication attempts. It works by scanning logs, detecting patterns of brute-force or abuse, and updating the firewall (via nftables) to ban offending IPs temporarily or permanently.
+
+When an IP exceeds the maxretry threshold within the findtime window, fail2ban bans it for the specified bantime. With `bantime.increment = true`, repeat offenders face progressively longer bans.
+
 ## SSH Jail
 
 ```bash
