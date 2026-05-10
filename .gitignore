@@ -27,3 +27,6 @@ Thumbs.db
 # Database
 *.sqlite
 *.sqlite3
+
+# Obsidian
+.obsidian/
