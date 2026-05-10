@@ -12,6 +12,9 @@ docker-compose.override.yml
 **/letsencrypt/archive/*
 **/letsencrypt/live/*
 **/letsencrypt/accounts/*
+*.key
+*.pem
+**/keys.json
 
 # Logs
 *.log
