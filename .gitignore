@@ -1,0 +1,21 @@
+# Environment files
+.env
+.env.*
+*.pem
+*.key
+
+# Docker
+docker-compose.override.yml
+
+# Secrets
+**/secrets/*
+**/letsencrypt/archive/*
+**/letsencrypt/live/*
+**/letsencrypt/accounts/*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
