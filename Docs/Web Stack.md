@@ -28,6 +28,8 @@ Cloudflare handles public HTTPS and edge routing. Nginx Proxy Manager routes HTT
 
 ## Nginx Proxy Manager
 
+Folder: `nginx-proxy-manager/`
+
 Containers:
 
 ```text
@@ -42,7 +44,7 @@ Local bindings:
 127.0.0.1:81    NPM Admin UI
 ```
 
-No local HTTPS is needed because Cloudflare terminates public HTTPS.
+Credentials: Tunnel token is stored in `.env` file, not hardcoded in docker-compose.
 
 ## Cloudflare Tunnel
 
