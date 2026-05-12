@@ -5,14 +5,11 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:80:80"
-      - "127.0.0.1:443:443"
       - "127.0.0.1:81:81"
     volumes:
       - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
     networks:
       - nginx-proxy-manager_default
-
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
@@ -20,7 +17,6 @@ services:
     command: tunnel run --token eyJhIjoiMWY2YjAyNzdkNDBkOWZjZGI2NmMwY2MxZDYxYjg3Y2YiLCJ0IjoiODA4ZTY1YjYtYmMwNC00YTRmLWIzYmMtMjM2YWYzYTViMGU3IiwicyI6Ik1ETTVNREZsT0RjdFptTTRNUzAwT0RjNExUZ3dOVEV0WW1JeU1EazJNREJpTXpZMyJ9
     networks:
       - nginx-proxy-manager_default
-
 networks:
   nginx-proxy-manager_default:
     external: true

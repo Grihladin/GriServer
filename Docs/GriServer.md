@@ -1,47 +1,27 @@
 
 Personal VPS for hosting AI services and experiments.
 
-## Specs
+## Server
 
-- Provider/server IP: `37.114.37.182`
-- Host alias: `GriServer`
+- IP: `37.114.37.182`
 - OS: Ubuntu 24.04.4 LTS
-- CPU: 2 vCPU
-- RAM: 7.8 GiB
-- Disk: 48 GB root disk
-- User: `grihladin`
-
-## Connection
-
-Connect from Mac:
-
-```bash
-ssh GriServer
-```
+- 2 vCPU (AMD Ryzen™ 9 5950x)
+- 8 GB RAM
+- 50 GB NVMe storage
+- Location: Frankfurt, Germany
 
 ## Topics
 
-- [[GriServer - SSH Setup|SSH Setup]]
-- [[GriServer - Docker|Docker]]
-- [[GriServer - Firewall|Firewall]]
-- [[GriServer - Domain|Domain & DNS]]
-- [[GriServer - Nginx Proxy Manager|Nginx Proxy Manager]]
-- [[GriServer - Landing Page|Landing Page]]
-- [[GriServer - Fail2ban|Fail2ban]]
-- [[GriServer - Hosting Pattern|Hosting Pattern]]
-- [[GriServer - Commands|Useful Commands]]
+- [[Docker|Docker]]
+- [[Security|Security]]
+- [[Web Stack|Web Stack]]
 
 ## Current State
 
-- Docker installed and verified
-- Firewall enabled with only SSH, HTTP, and HTTPS allowed inbound
-- Fail2ban enabled for SSH protection
-- Docker log rotation configured
-- Nginx Proxy Manager running for `griserver.com`
-- HTTPS enabled with Let's Encrypt for `griserver.com` and `www.griserver.com`
-
-## Purpose
-
-Use this server as a small, production-like playground for Docker-hosted AI services.
-
-For now, services should be deployed with Docker Compose and exposed through a reverse proxy later, not by opening random app ports directly.
+- SSH is key-only; root and password login are disabled
+- Docker and Docker Compose are installed
+- Docker log rotation is configured
+- UFW allows SSH, with web traffic restricted to Cloudflare
+- Fail2ban protects SSH
+- Nginx Proxy Manager and Cloudflare Tunnel route `griserver.com`
+- Cloudflare handles public HTTPS; NPM proxies HTTP internally
