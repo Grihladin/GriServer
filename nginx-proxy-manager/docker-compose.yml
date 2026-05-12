@@ -1,7 +1,7 @@
 services:
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
-    container_name: nginx
+    container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
       - "127.0.0.1:80:80"
@@ -14,7 +14,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
-    command: tunnel run --token eyJhIjoiMWY2YjAyNzdkNDBkOWZjZGI2NmMwY2MxZDYxYjg3Y2YiLCJ0IjoiODA4ZTY1YjYtYmMwNC00YTRmLWIzYmMtMjM2YWYzYTViMGU3IiwicyI6Ik1ETTVNREZsT0RjdFptTTRNUzAwT0RjNExUZ3dOVEV0WW1JeU1EazJNREJpTXpZMyJ9
+    command: tunnel run --token CENSORED
     networks:
       - nginx-proxy-manager_default
 networks:
