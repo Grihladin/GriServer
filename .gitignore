@@ -28,5 +28,10 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
+# Beszel runtime data
+dashboard_beszel/beszel_agent_data/
+dashboard_beszel/beszel_data/
+dashboard_beszel/beszel_socket/
+
 # Obsidian
 .obsidian/
