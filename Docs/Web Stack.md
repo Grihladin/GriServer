@@ -31,7 +31,7 @@ Cloudflare handles public HTTPS and edge routing. Nginx Proxy Manager routes HTT
 Containers:
 
 ```text
-nginx
+nginx-proxy-manager
 cloudflared
 ```
 
