@@ -7,6 +7,12 @@ services:
       - ./html:/usr/share/nginx/html:ro
     networks:
       - npm
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      interval: 120s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   npm:

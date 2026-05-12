@@ -12,6 +12,12 @@ services:
       - ./beszel_socket:/beszel_socket
     networks:
       - nginx-proxy-manager_default
+    healthcheck:
+      test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
+      interval: 120s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   beszel-agent:
     image: henrygd/beszel-agent:latest
@@ -27,6 +33,15 @@ services:
       HUB_URL: http://localhost:8090
       TOKEN: "${BESZEL_AGENT_TOKEN}"
       KEY: "${BESZEL_AGENT_KEY}"
+    healthcheck:
+      test: ["CMD", "/agent", "health"]
+      interval: 120s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      beszel:
+        condition: service_healthy
 
 networks:
   nginx-proxy-manager_default:
