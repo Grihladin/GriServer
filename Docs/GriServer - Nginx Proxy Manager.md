@@ -1,27 +1,46 @@
 Related: [[GriServer]]
 
-Nginx Proxy Manager is running as a Docker Compose stack.
+Nginx Proxy Manager is running as a Docker Compose stack with Cloudflare Tunnel for secure, portless access.
 
 ## Stack
 
 Stack path:
-
 ```text
-/opt/stacks/nginx-proxy-manager
+/home/grihladin/GriServer_prod/nginx
 ```
 
-Container:
-
+Containers:
 ```text
-nginx
+nginx          Nginx Proxy Manager
+cloudflared    Cloudflare Tunnel
 ```
 
-Public ports:
+## Architecture
+
+```
+User ---> Cloudflare ---> cloudflared tunnel ---> nginx-proxy-manager (127.0.0.1:80/443)
+```
+
+Cloudflare handles:
+- SSL/TLS termination
+- Certificate management
+- DDoS protection
+- Edge caching
+
+Nginx Proxy Manager handles:
+- Reverse proxy to internal services
+- HTTP only (no SSL)
+- Route requests to containerized apps
+
+## Ports
 
 ```text
-80/tcp   HTTP
-443/tcp  HTTPS
+127.0.0.1:80    HTTP (nginx-proxy-manager)
+127.0.0.1:443   HTTPS (nginx-proxy-manager)
+127.0.0.1:81    Admin UI
 ```
+
+Ports are bound to localhost only. No direct internet access to these ports.
 
 ## Admin UI
 
@@ -29,22 +48,19 @@ Public ports:
 127.0.0.1:81
 ```
 
-The admin UI is intentionally bound to localhost on the server, not exposed publicly.
+The admin UI is bound to localhost, not exposed publicly.
 
 Open the admin UI from Mac with an SSH tunnel:
-
 ```bash
 ssh -L 8181:127.0.0.1:81 GriServ
 ```
 
 Then open:
-
 ```text
 http://localhost:8181
 ```
 
 Admin account:
-
 ```text
 Email: ratkem144@gmail.com
 Password: <REDACTED>
@@ -52,53 +68,28 @@ Password: <REDACTED>
 
 ## Proxy Hosts
 
-Configured proxy host:
+When adding proxy hosts:
+- **Scheme:** HTTP
+- **SSL Certificate:** None
+- **Force SSL:** Off
+
+Cloudflare handles HTTPS externally. NPM only sees HTTP traffic from the tunnel.
+
+## Cloudflare Tunnel
+
+The `cloudflared` container maintains a persistent tunnel to Cloudflare.
+
+- No inbound ports needed on the server
+- All traffic flows through Cloudflare's network
+- Tunnel authenticates with a token stored in docker-compose.yml
+
+## UFW Configuration
+
+UFW allows only Cloudflare IPs on ports 80/443 as a secondary layer. The tunnel itself doesn't require open ports since it initiates outbound connections to Cloudflare.
 
 ```text
-griserver.com
-www.griserver.com
-```
-
-Forward target:
-
-```text
-http://griserver-landing:80
-```
-
-## SSL
-
-```text
-Provider: Let's Encrypt
-Email: ratkem144@gmail.com
-Certificate: griserver.com, www.griserver.com
-Force SSL: enabled
-HTTP/2: enabled
-Expires: 2026-08-07 21:19:55 UTC
-Issuer: Let's Encrypt E7
-```
-
-Auto-renewal:
-
-```text
-Enabled by Nginx Proxy Manager
-Renewal check: certs expiring within 30 days
-Renewal config: /etc/letsencrypt/renewal/npm-1.conf inside the nginx container
-Validation method: HTTP-01 through port 80
-```
-
-Requirements for renewal:
-
-- The `nginx` container must be running.
-- DNS for `griserver.com` and `www.griserver.com` must keep pointing to `37.114.37.182`.
-- Port `80` must stay reachable from the public internet.
-- Nginx Proxy Manager must keep handling `/.well-known/acme-challenge/` requests.
-
-Verified behavior:
-
-```text
-http://griserver.com       -> 301 redirect to https://griserver.com/
-https://griserver.com      -> HTTP/2 200
-https://www.griserver.com  -> HTTP/2 200
+22/tcp        SSH (open to all)
+80,443/tcp    Cloudflare IPs only
 ```
 
 ## Compose File
@@ -110,10 +101,40 @@ services:
     container_name: nginx
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
       - "127.0.0.1:81:81"
     volumes:
       - ./data:/data
       - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - nginx-proxy-manager_default
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run --token <TOKEN>
+    networks:
+      - nginx-proxy-manager_default
+
+networks:
+  nginx-proxy-manager_default:
+    external: true
 ```
+
+## SSL
+
+No SSL configured. Cloudflare manages certificates and SSL termination for all traffic.
+
+When adding proxy hosts in the future:
+- SSL tab: None
+- Scheme: HTTP
+- Force SSL: Off
+
+## Removed
+
+- Let's Encrypt certificates removed
+- certbot not installed
+- No SSL certificates stored on server
+- No port 80/443 open to public internet
