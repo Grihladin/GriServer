@@ -8,8 +8,16 @@ services:
       - "127.0.0.1:81:81"
     volumes:
       - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
     networks:
       - nginx-proxy-manager_default
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:81/"]
+      interval: 120s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
@@ -17,6 +25,15 @@ services:
     command: tunnel run --token CENSORED
     networks:
       - nginx-proxy-manager_default
+    environment:
+      - TUNNEL_METRICS=0.0.0.0:35843
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:35843", "ready"]
+      interval: 120s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
 networks:
   nginx-proxy-manager_default:
     external: true
